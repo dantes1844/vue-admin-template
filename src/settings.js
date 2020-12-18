@@ -4,13 +4,20 @@ module.exports = {
 
   /**
    * @type {boolean} true | false
-   * @description Whether fix the header
+   * @description 是否固定头部
    */
   fixedHeader: true,
 
   /**
    * @type {boolean} true | false
-   * @description Whether show the logo in sidebar
+   * @description 是否显示左侧的logo
    */
-  sidebarLogo: true
+  sidebarLogo: true,
+
+  /**
+   * @type {string} medium | small | mini
+   * @description 全局配置按钮的大小
+   */
+  controlSize: "mini",
+
 }

@@ -1,11 +1,13 @@
 import defaultSettings from '@/settings'
 
-const { showSettings, fixedHeader, sidebarLogo } = defaultSettings
+//添加了配置之后需要在这里设置
+const { showSettings, fixedHeader, sidebarLogo,controlSize } = defaultSettings
 
 const state = {
   showSettings: showSettings,
   fixedHeader: fixedHeader,
-  sidebarLogo: sidebarLogo
+  sidebarLogo: sidebarLogo,
+  controlSize: controlSize
 }
 
 const mutations = {
