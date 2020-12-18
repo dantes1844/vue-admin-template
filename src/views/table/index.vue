@@ -116,23 +116,27 @@
       <el-table-column
         label="操作"
         align="center"
-        width="230"
+        width="280"
         class-name="small-padding fixed-width">
         <template slot-scope="{ row, $index }">
           <el-button
             type="primary"
             :size="controlSize"
+            icon="el-icon-edit"
             @click="handleUpdate(row)">编辑</el-button>
           <el-button
+            icon="el-icon-check"
             v-if="row.status != 'published'"
             :size="controlSize"
             type="success"
             @click="handleModifyStatus(row, 'published')">发布</el-button>
           <el-button
+            icon="el-icon-close"
             v-if="row.status != 'draft'"
             :size="controlSize"
             @click="handleModifyStatus(row, 'draft')">下架</el-button>
           <el-button
+            icon="el-icon-delete"
             v-if="row.status != 'deleted'"
             :size="controlSize"
             type="danger"
