@@ -60,6 +60,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.el-popper{
+  margin-top: -15px;
+  width: 160px;
+}
 .navbar {
   height: 50px;
   overflow: hidden;
