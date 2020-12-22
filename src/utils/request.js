@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { MessageBox, Message } from 'element-ui'
 import store from '@/store'
-import { getToken } from '@/utils/auth'
+import { getAntiForgeryToken, getToken } from '@/utils/auth'
 
 // create an axios instance
 const service = axios.create({
@@ -19,8 +19,10 @@ service.interceptors.request.use(
       // let each request carry token
       // ['X-Token'] is a custom headers key
       // please modify it according to the actual situation
-      config.headers['X-Token'] = getToken()
+      config.headers['Authorization'] = 'Bearer '+getToken();
     }
+    //这个是添加防伪处理的，目前登陆时发现不加也不会出错，后期看插入数据时会不会有问题。
+    config.headers['XSRF-TOKEN'] = getAntiForgeryToken();
     return config
   },
   error => {
@@ -44,9 +46,9 @@ service.interceptors.response.use(
    */
   response => {
     const res = response.data
-
-    // if the custom code is not 20000, it is judged as an error.
-    if (res.code !== 20000) {
+    var responseCode = response.status;
+    // if the custom code is not 200, it is judged as an error.
+    if (responseCode !== 200) {
       Message({
         message: res.message || 'Error',
         type: 'error',
@@ -54,7 +56,7 @@ service.interceptors.response.use(
       })
 
       // 50008: Illegal token; 50012: Other clients logged in; 50014: Token expired;
-      if (res.code === 50008 || res.code === 50012 || res.code === 50014) {
+      if (responseCode === 500 || responseCode === 400) {
         // to re-login
         MessageBox.confirm('You have been logged out, you can cancel to stay on this page, or log in again', 'Confirm logout', {
           confirmButtonText: 'Re-Login',
@@ -68,7 +70,7 @@ service.interceptors.response.use(
       }
       return Promise.reject(new Error(res.message || 'Error'))
     } else {
-      return res
+      return response
     }
   },
   error => {

@@ -32,14 +32,14 @@ const mutations = {
 }
 
 const actions = {
-  // user login
   login({ commit }, userInfo) {
-    const { username, password } = userInfo
+    const { userNameOrEmailAddress, password } = userInfo
     return new Promise((resolve, reject) => {
-      login({ username: username.trim(), password: password }).then(response => {
-        const { data } = response
-        commit('SET_TOKEN', data.token)
-        setToken(data.token)
+      login({ userNameOrEmailAddress: userNameOrEmailAddress.trim(), password: password })
+      .then(response => {
+        var accessToken = response.data.result.accessToken;
+        commit('SET_TOKEN', accessToken)//通知vuex修改全局状态
+        setToken(accessToken)
         resolve()
       }).catch(error => {
         reject(error)
@@ -50,24 +50,23 @@ const actions = {
   // get user info
   getInfo({ commit, state }) {
     return new Promise((resolve, reject) => {
-      getInfo(state.token).then(response => {
-        const { data } = response
+      getInfo(state.userId).then(response => {
+        const { result } = response.data
 
-        if (!data) {
+        if (!result) {
           reject('Verification failed, please Login again.')
         }
 
-        const { roles, name, avatar } = data
-
+        const { roleNames, name } = result
         // roles must be a non-empty array
-        if (!roles || roles.length <= 0) {
+        if (!roleNames || roleNames.length <= 0) {
           reject('getInfo: roles must be a non-null array!')
         }
-
-        commit('SET_ROLES', roles)
+        console.log('modules.user.js roles before:',roleNames);
+        commit('SET_ROLES', roleNames)
+        console.log('modules.user.js roles after:',roleNames);
         commit('SET_NAME', name)
-        commit('SET_AVATAR', avatar)
-        resolve(data)
+        resolve(result)
       }).catch(error => {
         reject(error)
       })

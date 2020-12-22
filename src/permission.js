@@ -8,18 +8,15 @@ import getPageTitle from '@/utils/get-page-title'
 
 NProgress.configure({ showSpinner: false }) // NProgress Configuration
 
-const whiteList = ['/login'] // no redirect whitelist
+const whiteList = ['/login'] // 不需要登陆的页面列表
 
 router.beforeEach(async(to, from, next) => {
-  // start progress bar
   NProgress.start()
 
-  // set page title
   document.title = getPageTitle(to.meta.title)
 
-  // determine whether the user has logged in
+  // 检查是否有登录信息
   const hasToken = getToken()
-
   if (hasToken) {
     if (to.path === '/login') {
       // if is logged in, redirect to the home page
@@ -32,14 +29,13 @@ router.beforeEach(async(to, from, next) => {
         next()
       } else {
         try {
-          // get user info
-          // note: roles must be a object array! such as: ['admin'] or ,['developer','editor']
-          const { roles } = await store.dispatch('user/getInfo')
+          // 获取用户信息，角色必须以数组的形式返回，如: ['admin'] 或 ['developer','editor']
+          const { roleNames } = await store.dispatch('user/getInfo')
 
-          // generate accessible routes map based on roles
-          const accessRoutes = await store.dispatch('permission/generateRoutes', roles)
+          // 根据角色来设置不同的路由
+          const accessRoutes = await store.dispatch('permission/generateRoutes', roleNames)
 
-          // dynamically add accessible routes
+          // 动态的添加路由
           router.addRoutes(accessRoutes)
 
           // hack method to ensure that addRoutes is complete
