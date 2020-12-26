@@ -2,16 +2,16 @@
   <div class="app-container">
     <el-form
       ref="form"
-      :model="form"
+      :model="searchForm"
       label-width="100px"
       label-position="left"
       :size="controlSize"
       :inline="true" >
       <el-form-item label="名称">
-        <el-input v-model="form.name" />
+        <el-input v-model="searchForm.name" />
       </el-form-item>
       <el-form-item label="区域">
-        <el-select v-model="form.region" placeholder="请选择">
+        <el-select v-model="searchForm.region" placeholder="请选择">
           <el-option label="北京" value="beijing" />
           <el-option label="上海" value="shanghai" />
         </el-select>
@@ -19,7 +19,7 @@
       <el-form-item label="时间">
         <el-col>
           <el-date-picker
-          v-model="form.date1"
+          v-model="searchForm.date1"
           type="daterange"
           range-separator="至"
           start-placeholder="开始日期"
@@ -28,10 +28,10 @@
         </el-col>
       </el-form-item>
       <el-form-item label="布尔值">
-        <el-switch v-model="form.delivery" />
+        <el-switch v-model="searchForm.delivery" />
       </el-form-item>
       <el-form-item label="Activity type">
-        <el-checkbox-group v-model="form.type">
+        <el-checkbox-group v-model="searchForm.type">
           <el-checkbox label="Online activities" name="type" />
           <el-checkbox label="Promotion activities" name="type" />
           <el-checkbox label="Offline activities" name="type" />
@@ -39,7 +39,7 @@
         </el-checkbox-group>
       </el-form-item>
       <el-form-item label="Resources">
-        <el-radio-group v-model="form.resource">
+        <el-radio-group v-model="searchForm.resource">
           <el-radio label="Sponsor" />
           <el-radio label="Venue" />
         </el-radio-group>
@@ -69,8 +69,7 @@
               <el-button
                 type="primary"
                 :size="controlSize"
-                icon="el-icon-upload2"
-                @click="handleImport">导入</el-button>
+                icon="el-icon-upload2">导入</el-button>
             </router-link>
         </el-col>
       </el-row>
@@ -83,51 +82,29 @@
       border
       fit
       highlight-current-row>
-      <el-table-column align="center" label="ID" width="95">
+      <el-table-column label="邮箱" align="center">
         <template slot-scope="scope">
-          {{ scope.$index }}
+          {{ scope.row.emailAddress }}
         </template>
       </el-table-column>
-      <el-table-column label="Title">
+      <el-table-column label="用户名" align="center">
         <template slot-scope="scope">
-          {{ scope.row.title }}
+          {{ scope.row.userName }}
         </template>
       </el-table-column>
-      <el-table-column label="Author" width="110" align="center">
+      <el-table-column label="姓" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.author }}</span>
+          <span>{{ scope.row.surname }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="Pageviews" width="110" align="center">
+      <el-table-column label="名" align="center">
         <template slot-scope="scope">
-          {{ scope.row.pageviews }}
-        </template>
-      </el-table-column>
-      <el-table-column
-        class-name="status-col"
-        label="Status"
-        width="110"
-        align="center">
-        <template slot-scope="scope">
-          <el-tag
-          :size="controlSize"
-          :type="scope.row.status | statusFilter">{{ scope.row.status }}</el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column
-        align="center"
-        prop="created_at"
-        label="Display_time"
-        width="200">
-        <template slot-scope="scope">
-          <i class="el-icon-time" />
-          <span>{{ scope.row.display_time }}</span>
+          {{ scope.row.name }}
         </template>
       </el-table-column>
       <el-table-column
         label="操作"
         align="center"
-        width="280"
         class-name="small-padding fixed-width">
         <template slot-scope="{ row, $index }">
           <el-button
@@ -135,17 +112,6 @@
             :size="controlSize"
             icon="el-icon-edit"
             @click="handleUpdate(row)">编辑</el-button>
-          <el-button
-            icon="el-icon-check"
-            v-if="row.status != 'published'"
-            :size="controlSize"
-            type="success"
-            @click="handleModifyStatus(row, 'published')">发布</el-button>
-          <el-button
-            icon="el-icon-close"
-            v-if="row.status != 'draft'"
-            :size="controlSize"
-            @click="handleModifyStatus(row, 'draft')">下架</el-button>
           <el-button
             icon="el-icon-delete"
             v-if="row.status != 'deleted'"
@@ -166,27 +132,25 @@
       <el-form
         ref="dataForm"
         :rules="rules"
-        :model="temp"
+        :model="userDto"
         :size="controlSize"
-        label-position="left"
-        label-width="70px"
-        style="width: 400px; margin-left:50px;">
-        <el-form-item label="日期" prop="timestamp">
-          <el-date-picker v-model="temp.timestamp" type="datetime" placeholder="Please pick a date" />
+        label-position="right"
+        label-width="120px"
+        :inline=true>
+        <el-form-item label="用户名" prop="userName">
+           <el-input v-model="userDto.userName" type="text" placeholder="用户名" />
         </el-form-item>
-        <el-form-item label="标题" prop="title">
-          <el-input v-model="temp.title" />
+        <el-form-item label="邮箱" prop="emailAddress">
+          <el-input v-model="userDto.emailAddress" type="text" placeholder="邮箱" />
         </el-form-item>
-        <el-form-item label="状态">
-          <el-select v-model="temp.status" class="filter-item" placeholder="Please select">
-            <el-option v-for="item in statusOptions" :key="item" :label="item" :value="item" />
-          </el-select>
+        <el-form-item label="姓" prop="surname">
+          <el-input v-model="userDto.surname" type="text" placeholder="姓" />
         </el-form-item>
-        <el-form-item label="重要性">
-          <el-rate v-model="temp.importance" :colors="['#99A9BF', '#F7BA2A', '#FF9900']" :max="3" style="margin-top:8px;" />
+        <el-form-item label="名" prop="name">
+          <el-input v-model="userDto.name" type="text" placeholder="名" />
         </el-form-item>
-        <el-form-item label="备注">
-          <el-input v-model="temp.remark" :autosize="{ minRows: 2, maxRows: 4}" type="textarea" placeholder="Please input" />
+        <el-form-item label="激活">
+          <el-switch v-model="userDto.isActive" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -209,6 +173,8 @@
 <script>
 import { getArticleList } from "@/api/table";
 import Pagination from "@/components/Pagination";
+import { createUser, getUserList,deleteUser } from '@/api/user'
+import { MessageBox, Message } from 'element-ui'
 
 export default {
   components: { Pagination },
@@ -225,7 +191,7 @@ export default {
   data() {
     return {
       total: 0,
-      list: null,
+      list: [],
       listLoading: true,
       dialogFormVisible: false,
       listQuery: {
@@ -236,7 +202,7 @@ export default {
         type: undefined,
         sort: "+id"
       },
-      form: {
+      searchForm: {
         name: '',
         region: '',
         date1: '',
@@ -246,14 +212,13 @@ export default {
         resource: '',
         desc: ''
       },
-      temp: {
+      userDto: {
         id: undefined,
-        importance: 1,
-        remark: '',
-        timestamp: new Date(),
-        title: '',
-        type: '',
-        status: 'published'
+        userName: '',
+        name: '',
+        surname: '',
+        emailAddress: '',
+        isActive: false
       },
       dialogStatus: '',
       statusOptions: ['published', 'draft', 'deleted'],
@@ -262,9 +227,10 @@ export default {
         create: 'Create'
       },
       rules: {
-        type: [{ required: true, message: 'type is required', trigger: 'change' }],
-        timestamp: [{ type: 'date', required: true, message: 'timestamp is required', trigger: 'change' }],
-        title: [{ required: true, message: 'title is required', trigger: 'blur' }]
+        emailAddress: [{ required: true, message: '邮箱必须填写', trigger: 'blur' }],
+        userName: [{ required: true, message: '用户名必须填写', trigger: 'blur' }],
+        surname: [{ required: true, message: '姓必须填写', trigger: 'blur' }],
+        name: [{ required: true, message: '名必须填写', trigger: 'blur' }]
       },
     };
   },
@@ -277,14 +243,12 @@ export default {
         }
   },
   methods: {
-    handleCreate(){
-
-    },
     getList() {
       this.listLoading = true;
-      getArticleList(this.listQuery).then(response => {
-        this.list = response.data.items;
-        (this.listLoading = false), (this.total = response.data.total);
+      getUserList(this.listQuery).then(response => {
+        var result = response.data.result;
+        this.list = result.items;
+        (this.listLoading = false), (this.total = result.totalCount);
       });
     },
     handleModifyStatus(row, status) {
@@ -316,10 +280,8 @@ export default {
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          this.temp.id = parseInt(Math.random() * 100) + 1024 // mock a id
-          this.temp.author = 'vue-element-admin'
-          createArticle(this.temp).then(() => {
-            this.list.unshift(this.temp)
+          console.log('user.index.vue',this.userDto);
+            createUser(this.userDto).then(() => {
             this.dialogFormVisible = false
             this.$notify({
               title: '成功',
@@ -360,22 +322,22 @@ export default {
       })
     },
     handleDelete(row, index) {
-      this.$notify({
-        title: "成功",
-        message: "删除成功",
-        type: "success",
-        duration: 2000
-      });
-      this.list.splice(index, 1);
+       MessageBox.confirm('确定删除当前用户吗?', '删除确认', {
+          confirmButtonText: '删除',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          deleteUser(row.id).then(() => {
+            this.getList();
+          })
+        })
+
     },
     onSubmit() {
-      this.$message('submit!')
+      this.getList();
     },
     onCancel() {
-      this.$message({
-        message: 'cancel!',
-        type: 'warning'
-      })
+      this.resetTemp();
     }
   }
 };

@@ -1,4 +1,4 @@
-import { login, logout, getInfo } from '@/api/user'
+import { login, logout, getInfo, createUser,deleteUser } from '@/api/user'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import { resetRouter } from '@/router'
 
@@ -62,9 +62,7 @@ const actions = {
         if (!roleNames || roleNames.length <= 0) {
           reject('getInfo: roles must be a non-null array!')
         }
-        console.log('modules.user.js roles before:',roleNames);
         commit('SET_ROLES', roleNames)
-        console.log('modules.user.js roles after:',roleNames);
         commit('SET_NAME', name)
         resolve(result)
       }).catch(error => {
@@ -94,7 +92,27 @@ const actions = {
       commit('RESET_STATE')
       resolve()
     })
-  }
+  },
+  createUser({ commit },userDto){
+    return new Promise((resolve, reject) => {
+      createUser(userDto).then(() => {
+        resolve()
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  },
+  deleteUser({ commit },userId){
+    return new Promise((resolve, reject) => {
+      deleteUser(userId).then(() => {
+        resolve()
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  },
+
+
 }
 
 export default {

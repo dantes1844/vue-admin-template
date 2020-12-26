@@ -6,11 +6,10 @@ export function login(data) {
     method: 'post',
     data
   })
-  console.log('response',response);
   return response;
 }
 
-export function getInfo(token) {
+export function getInfo() {
   return request({
     url: '/api/TokenAuth/GetUserInfo',
     method: 'post'
@@ -22,4 +21,28 @@ export function logout() {
     url: '/api/TokenAuth/Logout',
     method: 'post'
   })
+}
+
+export function getUserList(params){
+  return request({
+    url:'/api/services/app/user/getAll',
+    method:'get',
+    params
+  });
+}
+
+export function createUser(createUserDto){
+  return request({
+    url:'/api/services/app/user/create',
+    method:'post',
+    data:createUserDto
+  });
+}
+
+export function deleteUser(userId){
+  return request({
+    url:'/api/services/app/user/delete',
+    method:'delete',
+    params:{id:userId}
+  });
 }
